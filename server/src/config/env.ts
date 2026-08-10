@@ -12,8 +12,9 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   BCRYPT_ROUNDS: z.coerce.number().int().min(8).max(15).default(12),
 });
+
 const parsed = envSchema.safeParse(process.env);
-console.log('parsed', parsed);
+
 if (!parsed.success) {
   console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
   process.exit(1);

@@ -1,72 +1,72 @@
-// Prisma schema for the approval workflow API
-generator client {
-  provider = "prisma-client-js"
-}
+  // Prisma schema for the approval workflow API
+  generator client {
+    provider = "prisma-client-js"
+  }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
 
-enum Role {
-  REQUESTER
-  APPROVER
-  ADMIN
-}
+  enum Role {
+    REQUESTER
+    APPROVER
+    ADMIN
+  }
 
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
+  enum RequestStatus {
+    PENDING
+    APPROVED
+    REJECTED
+  }
 
-model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  name         String
-  passwordHash String
-  role         Role     @default(REQUESTER)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  model User {
+    id           String   @id @default(uuid())
+    email        String   @unique
+    name         String
+    passwordHash String
+    role         Role     @default(REQUESTER)
+    isActive     Boolean  @default(true)
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
 
-  requests        Request[]      @relation("RequesterRequests")
-  decisions       Request[]      @relation("ApproverDecisions")
-  refreshTokens   RefreshToken[]
+    requests        Request[]      @relation("RequesterRequests")
+    decisions       Request[]      @relation("ApproverDecisions")
+    refreshTokens   RefreshToken[]
 
-  @@index([role])
-}
+    @@index([role])
+  }
 
-model RefreshToken {
-  id        String   @id @default(uuid())
-  tokenHash String   @unique
-  userId    String
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime @default(now())
+  model RefreshToken {
+    id        String   @id @default(uuid())
+    tokenHash String   @unique
+    userId    String
+    expiresAt DateTime
+    revokedAt DateTime?
+    createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-}
+    @@index([userId])
+  }
 
-model Request {
-  id          String        @id @default(uuid())
-  title       String
-  description String
-  amount      Decimal       @db.Decimal(12, 2)
-  status      RequestStatus @default(PENDING)
-  decisionNote String?
-  decidedAt   DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  model Request {
+    id          String        @id @default(uuid())
+    title       String
+    description String
+    amount      Decimal       @db.Decimal(12, 2)
+    status      RequestStatus @default(PENDING)
+    decisionNote String?
+    decidedAt   DateTime?
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
 
-  requesterId String
-  requester   User   @relation("RequesterRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+    requesterId String
+    requester   User   @relation("RequesterRequests", fields: [requesterId], references: [id], onDelete: Cascade)
 
-  approverId String?
-  approver   User?   @relation("ApproverDecisions", fields: [approverId], references: [id], onDelete: SetNull)
+    approverId String?
+    approver   User?   @relation("ApproverDecisions", fields: [approverId], references: [id], onDelete: SetNull)
 
-  @@index([requesterId])
-  @@index([status])
-}
+    @@index([requesterId])
+    @@index([status])
+  }
