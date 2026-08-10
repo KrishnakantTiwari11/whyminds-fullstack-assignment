@@ -7,7 +7,6 @@ import { env, isProduction } from './config/env';
 import { apiRouter } from './routes';
 import { apiLimiter } from './middleware/rateLimit';
 import { errorHandler, notFoundHandler } from './middleware/error';
-import './types/express';
 
 export const createApp = () => {
   const app = express();
